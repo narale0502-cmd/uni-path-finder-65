@@ -2,15 +2,30 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      toast.error("Vui lòng điền đầy đủ email và mật khẩu.");
+      return;
+    }
+    sessionStorage.setItem("userEmail", email);
+    toast.success(isSignUp ? "Đăng ký thành công!" : "Đăng nhập thành công!");
+    navigate("/dashboard");
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background orbs */}
       <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-float" />
       <div className="absolute bottom-1/4 right-1/4 w-60 h-60 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "3s" }} />
 
@@ -30,12 +45,14 @@ const LoginPage = () => {
           {isSignUp ? "Đăng ký để bắt đầu hành trình học tập." : "Đăng nhập để tiếp tục hành trình học tập."}
         </p>
 
-        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           {isSignUp && (
             <div className="relative">
               <input
                 type="text"
                 placeholder="Họ và tên"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full bg-muted rounded-xl px-4 py-3 pl-11 text-sm outline-none focus:ring-2 focus:ring-accent transition-all"
               />
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -46,6 +63,8 @@ const LoginPage = () => {
             <input
               type="email"
               placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-muted rounded-xl px-4 py-3 pl-11 text-sm outline-none focus:ring-2 focus:ring-accent transition-all"
             />
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -55,14 +74,12 @@ const LoginPage = () => {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Mật khẩu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-muted rounded-xl px-4 py-3 pl-11 pr-11 text-sm outline-none focus:ring-2 focus:ring-accent transition-all"
             />
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2"
-            >
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2">
               {showPassword ? <EyeOff className="w-4 h-4 text-muted-foreground" /> : <Eye className="w-4 h-4 text-muted-foreground" />}
             </button>
           </div>

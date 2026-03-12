@@ -4,22 +4,24 @@ import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import RoadmapTree from "@/components/roadmap/RoadmapTree";
-import SubjectDetailPanel from "@/components/roadmap/SubjectDetailPanel";
 import { majors } from "@/data/roadmapData";
-import type { Major, Subject } from "@/data/roadmapData";
+import type { Major } from "@/data/roadmapData";
+import { useNavigate } from "react-router-dom";
 
 const DiagramPage = () => {
   const [selectedMajor, setSelectedMajor] = useState<Major | null>(null);
-  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
-  const [activeTrack, setActiveTrack] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleTrackClick = (_trackId: string) => {
+    // Redirect to login, which then goes to dashboard
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <div className="pt-24 pb-16">
         <div className="container mx-auto px-6">
-          {/* Title */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
             <h1 className="font-heading text-3xl md:text-5xl font-bold mb-4">
               Khám phá <span className="gradient-text">lộ trình</span> học tập
@@ -29,30 +31,17 @@ const DiagramPage = () => {
             </p>
           </motion.div>
 
-          {/* Breadcrumb */}
           {selectedMajor && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-              <button
-                onClick={() => { setSelectedMajor(null); setActiveTrack(null); setSelectedSubject(null); }}
-                className="hover:text-foreground transition-colors"
-              >
+              <button onClick={() => setSelectedMajor(null)} className="hover:text-foreground transition-colors">
                 Tất cả ngành
               </button>
               <ChevronRight className="w-3 h-3" />
               <span className="text-foreground">{selectedMajor.name}</span>
-              {activeTrack && (
-                <>
-                  <ChevronRight className="w-3 h-3" />
-                  <span className="text-accent font-medium">
-                    {selectedMajor.tracks.find(t => t.id === activeTrack)?.name}
-                  </span>
-                </>
-              )}
             </div>
           )}
 
           <AnimatePresence mode="wait">
-            {/* Level 1: Major selection */}
             {!selectedMajor && (
               <motion.div
                 key="majors"
@@ -78,7 +67,7 @@ const DiagramPage = () => {
                       {major.subjects.length} môn học • {major.tracks.length} định hướng
                     </p>
                     <div className="flex flex-wrap gap-1.5">
-                      {major.tracks.map(t => (
+                      {major.tracks.map((t) => (
                         <span key={t.id} className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                           {t.icon} {t.name}
                         </span>
@@ -89,91 +78,45 @@ const DiagramPage = () => {
               </motion.div>
             )}
 
-            {/* Level 2: Roadmap tree */}
             {selectedMajor && (
-              <motion.div
-                key="roadmap"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mb-6"
-                  onClick={() => { setSelectedMajor(null); setActiveTrack(null); }}
-                >
+              <motion.div key="tracks" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+                <Button variant="ghost" size="sm" className="mb-6" onClick={() => setSelectedMajor(null)}>
                   <ArrowLeft className="w-4 h-4 mr-2" /> Quay lại
                 </Button>
 
-                {/* Major header & track selector */}
                 <div className="mb-8">
                   <div className="flex items-center gap-3 mb-4">
                     <span className="text-3xl">{selectedMajor.icon}</span>
                     <h2 className="font-heading text-2xl font-bold">{selectedMajor.name}</h2>
                   </div>
+                  <p className="text-muted-foreground mb-6">Chọn định hướng để đăng nhập và xem lộ trình chi tiết</p>
 
-                  {/* Track pills */}
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => setActiveTrack(null)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
-                        !activeTrack
-                          ? "bg-accent text-accent-foreground border-accent shadow-glow"
-                          : "bg-card border-border text-muted-foreground hover:border-accent/40"
-                      }`}
-                    >
-                      Tất cả
-                    </button>
-                    {selectedMajor.tracks.map(track => (
-                      <button
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {selectedMajor.tracks.map((track, i) => (
+                      <motion.button
                         key={track.id}
-                        onClick={() => setActiveTrack(activeTrack === track.id ? null : track.id)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
-                          activeTrack === track.id
-                            ? "bg-accent text-accent-foreground border-accent shadow-glow"
-                            : "bg-card border-border text-muted-foreground hover:border-accent/40"
-                        }`}
+                        onClick={() => handleTrackClick(track.id)}
+                        className="glass rounded-xl p-6 text-left hover:shadow-glow transition-all duration-300 group"
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
                       >
-                        {track.icon} {track.name}
-                      </button>
+                        <span className="text-2xl mb-3 block">{track.icon}</span>
+                        <h3 className="font-heading text-base font-semibold mb-1 group-hover:text-accent transition-colors">
+                          {track.name}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">{track.description}</p>
+                        <div className="mt-3 text-xs text-accent font-medium">Đăng nhập để xem →</div>
+                      </motion.button>
                     ))}
                   </div>
-
-                  {activeTrack && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-sm text-muted-foreground mt-3"
-                    >
-                      {selectedMajor.tracks.find(t => t.id === activeTrack)?.description}
-                    </motion.p>
-                  )}
                 </div>
-
-                {/* Tree roadmap */}
-                <RoadmapTree
-                  major={selectedMajor}
-                  activeTrack={activeTrack}
-                  onSubjectClick={setSelectedSubject}
-                />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
       <Footer />
-
-      {/* Subject detail side panel */}
-      <AnimatePresence>
-        {selectedSubject && selectedMajor && (
-          <SubjectDetailPanel
-            subject={selectedSubject}
-            major={selectedMajor}
-            onClose={() => setSelectedSubject(null)}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 };

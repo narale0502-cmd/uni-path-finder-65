@@ -10,6 +10,7 @@ import EventsPage from "./pages/EventsPage.tsx";
 import BillingPage from "./pages/BillingPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
+import DashboardPage from "./pages/DashboardPage.tsx";
 
 const queryClient = new QueryClient();
 
