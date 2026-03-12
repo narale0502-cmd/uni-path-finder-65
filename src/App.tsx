@@ -10,6 +10,7 @@ import EventsPage from "./pages/EventsPage.tsx";
 import BillingPage from "./pages/BillingPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
+import DashboardPage from "./pages/DashboardPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/billing" element={<BillingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
