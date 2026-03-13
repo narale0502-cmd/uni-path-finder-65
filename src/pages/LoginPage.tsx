@@ -20,6 +20,16 @@ const LoginPage = () => {
       return;
     }
     sessionStorage.setItem("userEmail", email);
+
+    // Admin credential check
+    if (email === "admin@unipath.edu" && password === "admin123") {
+      sessionStorage.setItem("isAdmin", "true");
+      toast.success("Đăng nhập Admin thành công!");
+      navigate("/admin");
+      return;
+    }
+
+    sessionStorage.removeItem("isAdmin");
     toast.success(isSignUp ? "Đăng ký thành công!" : "Đăng nhập thành công!");
     navigate("/dashboard");
   };
